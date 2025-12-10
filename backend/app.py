@@ -34,8 +34,6 @@ from routes.whatsapp_routes import whatsapp_bp
 app.register_blueprint(whatsapp_bp)
 from routes.billing_routes import billing_bp
 app.register_blueprint(billing_bp)
-from routes.test_routes import test_bp
-app.register_blueprint(test_bp)
 from routes.stats_routes import stats_bp
 app.register_blueprint(stats_bp)
 
