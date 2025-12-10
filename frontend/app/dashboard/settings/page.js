@@ -1,11 +1,11 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import api from '@/lib/api';
 import { useSearchParams, useRouter } from 'next/navigation';
 import ConnectWhatsApp from './ConnectWhatsApp';
 import { Save, Lock, Smartphone, Key, Cpu, Eye, EyeOff } from 'lucide-react';
 
-export default function SettingsPage() {
+function SettingsContent() {
   const [formData, setFormData] = useState({
     ai_api_key: '',
     ai_provider: 'openai',
@@ -180,5 +180,13 @@ export default function SettingsPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div style={{padding: '40px', textAlign: 'center'}}>Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }
