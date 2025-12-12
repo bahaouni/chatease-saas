@@ -6,6 +6,7 @@ import ProblemSolution from './components/landing/ProblemSolution';
 import HowItWorks from './components/landing/HowItWorks';
 import SocialProof from './components/landing/SocialProof';
 import Pricing from './components/landing/Pricing';
+import Waitlist from './components/landing/Waitlist';
 import FAQ from './components/landing/FAQ';
 import Footer from './components/landing/Footer';
 
@@ -20,6 +21,7 @@ export default function Home() {
         <HowItWorks />
         <SocialProof />
         <Pricing />
+        <Waitlist />
         <FAQ />
       </main>
 

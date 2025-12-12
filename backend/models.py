@@ -24,7 +24,8 @@ class User(db.Model):
             'id': self.id,
             'email': self.email,
             'whatsapp_phone_id': self.whatsapp_phone_id,
-            'is_active': self.is_active
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
 class FAQ(db.Model):

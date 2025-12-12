@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import ThemeToggle from '../components/ThemeToggle';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import i18n from '@/lib/i18n';
+import TrialCountdown from '../components/dashboard/TrialCountdown';
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
@@ -25,6 +26,7 @@ export default function DashboardLayout({ children }) {
     { name: 'Chat Logs', href: '/dashboard/logs', icon: FileText },
     { name: t('settings'), href: '/dashboard/settings', icon: Settings },
     { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
+    { name: 'Feedback', href: '/dashboard/feedback', icon: MessageSquare },
   ];
 
   const isRTL = i18n.dir() === 'rtl';
@@ -81,6 +83,8 @@ export default function DashboardLayout({ children }) {
         </nav>
 
         <div style={{ marginTop: 'auto', borderTop: '1px solid var(--glass-border)', paddingTop: '20px' }}>
+           <TrialCountdown />
+           
            <Link href="/dashboard/account" style={{ textDecoration: 'none' }}>
            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', padding: '0 8px', cursor: 'pointer' }}>
               <div style={{ 
