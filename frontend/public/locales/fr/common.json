@@ -1,0 +1,11 @@
+{
+    "welcome": "Bienvenue sur ChatEase AI",
+    "theme": {
+        "light": "Mode Clair",
+        "dark": "Mode Sombre"
+    },
+    "language": "Langue",
+    "settings": "Paramètres",
+    "dashboard": "Tableau de Bord",
+    "logout": "Se Déconnecter"
+}

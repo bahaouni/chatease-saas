@@ -1,0 +1,110 @@
+{
+  "welcome": "Welcome to ChatEase AI",
+  "logout": "Sign Out",
+  "dashboard": "Dashboard",
+  "settings": "Settings",
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode"
+  },
+  "hero": {
+    "title_start": "Your AI Replies to Customers on WhatsApp",
+    "title_end": "24/7.",
+    "subtitle": "Stop losing customers. Let AI answer messages automatically in your language — Arabic, English, French & more.",
+    "cta_primary": "Start Free Trial",
+    "cta_secondary": "Watch Demo",
+    "cta_sub": "No credit card required • Setup in 2 minutes",
+    "demo_user_1": "Hi! What's the price for delivery?",
+    "demo_ai_1": "Hello! 👋 Delivery is FREE for orders over $50. Standard delivery is $5.99. Express delivery (same-day) is $12.99. How can I help you today?",
+    "demo_user_2": "Do you have this in blue?",
+    "demo_ai_2": "Yes! We have it in Royal Blue, Navy, and Sky Blue. All sizes S-XXL are in stock. Would you like me to send you photos?"
+  },
+  "problem": {
+    "title": "Too Many WhatsApp Messages? You’re Losing Money.",
+    "p1_title": "Customers wait too long",
+    "p1_desc": "They message you, wait hours, and buy from competitors",
+    "p2_title": "You can't reply while busy",
+    "p2_desc": "During work, sleep, or meetings — messages pile up",
+    "p3_title": "Same questions 100 times",
+    "p3_desc": "\"Price?\" \"Delivery?\" \"Available?\" — over and over again",
+    "p4_title": "No time to grow",
+    "p4_desc": "You're stuck answering messages instead of growing your business"
+  },
+  "solution": {
+    "title": "Your Smart WhatsApp Assistant",
+    "f1_title": "Auto-Replies to Customers",
+    "f1_desc": "Instant AI replies based on your products & FAQs. Never miss a sale again.",
+    "f2_title": "Works in Arabic + English",
+    "f2_desc": "Saudi dialect, Gulf Arabic, Tunisian, Egyptian, English, French — all supported.",
+    "f3_title": "No App Needed",
+    "f3_desc": "Works directly on WhatsApp Business. No new apps to download or learn."
+  },
+  "how": {
+    "title": "Go Live in 3 Steps",
+    "step1_title": "Connect WhatsApp Business",
+    "step1_desc": "Link your WhatsApp Business number in seconds. Simple, secure, official API.",
+    "step2_title": "Add Your Products & FAQ",
+    "step2_desc": "Upload your product list or type common questions. Takes just 1 minute.",
+    "step3_title": "AI Starts Replying",
+    "step3_desc": "Your AI assistant goes live instantly. Watch it handle customers 24/7.",
+    "cta": "Start Free — No Credit Card"
+  },
+  "personas": {
+    "title": "Perfect for Small Businesses",
+    "p1": "Home Businesses",
+    "p2": "Online Sellers",
+    "p3": "Instagram/TikTok Sellers",
+    "p4": "Workshops & Tailors",
+    "p5": "Freelancers",
+    "p6": "Service Providers"
+  },
+  "proof": {
+    "label": "Trusted Worldwide • Loved by Small Businesses",
+    "t1_text": "My customers get instant replies now, even at 3 AM. Sales increased by 40% in the first month!",
+    "t1_author": "Sarah Al-Rashid",
+    "t1_role": "Online Fashion Store, Dubai",
+    "t2_text": "I was answering the same questions 50 times a day. Now AI handles it perfectly in Arabic.",
+    "t2_author": "Ahmed Hassan",
+    "t2_role": "Electronics Shop, Riyadh",
+    "t3_text": "Setup took 5 minutes. My AI speaks Tunisian dialect perfectly. Customers love it!",
+    "t3_author": "Fatima Ben Ali",
+    "t3_role": "Home Bakery, Tunis"
+  },
+  "pricing": {
+    "title": "Simple Pricing",
+    "subtitle": "One Plan. Everything Included.",
+    "plan_name": "Most Popular",
+    "price": "9",
+    "period": "/month",
+    "billing": "Billed monthly. Cancel anytime.",
+    "cta": "Start 7-Day Free Trial",
+    "cta_sub": "No credit card required. Setup in 2 minutes.",
+    "feat_1": "AI Auto-Reply 24/7",
+    "feat_2": "WhatsApp Business Integration",
+    "feat_3": "Unlimited FAQ & Products",
+    "feat_4": "Arabic + English + French",
+    "feat_5": "Custom Responses",
+    "feat_6": "Analytics Dashboard",
+    "feat_7": "Priority Support"
+  },
+  "faq": {
+    "title": "Got Questions?",
+    "q1": "Does it work with normal WhatsApp?",
+    "a1": "No, it works with WhatsApp Business API (WABA) for official auto-replies.",
+    "q2": "How fast are the replies?",
+    "a2": "Instant, usually within 1-2 seconds.",
+    "q3": "Is my WhatsApp number safe?",
+    "a3": "Yes, we use the official Meta Cloud API which is safe and compliant.",
+    "q4": "What languages does it support?",
+    "a4": "We support Arabic (all dialects), English, French, and many more.",
+    "q5": "Can I customize the replies?",
+    "a5": "Absolutely. You upload your own knowledge base and FAQs.",
+    "q6": "What if I want to cancel?",
+    "a6": "You can cancel anytime from your dashboard. No hidden fees."
+  },
+  "footer": {
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  }
+}

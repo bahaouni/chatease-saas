@@ -1,4 +1,6 @@
 import "./globals.css";
+import { Providers } from "./providers";
+import LanguageProvider from "./components/LanguageProvider";
 
 export const metadata = {
   title: "ChatEase AI - Premium Auto-Reply Agent",
@@ -7,9 +9,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <Providers>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -104,7 +104,6 @@ function SettingsContent() {
                  className="input-field" 
                  value={formData.ai_provider}
                  onChange={e => setFormData({...formData, ai_provider: e.target.value})}
-                 style={{ appearance: 'none', backgroundImage: 'none' }}
                >
                  <option value="openai">OpenAI (GPT-3.5)</option>
                  <option value="gemini">Google Gemini (Pro)</option>
@@ -116,13 +115,12 @@ function SettingsContent() {
              <div style={{ marginBottom: '16px' }}>
                <label className="label">{getProviderName(formData.ai_provider)} API Key</label>
                <div style={{ position: 'relative' }}>
-                 <input 
+                   <input 
                    type={showAiKey ? "text" : "password"}
-                   className="input-field" 
+                   className="input-field pr-10" 
                    placeholder={`Enter your ${getProviderName(formData.ai_provider)} Key...`}
                    value={formData.ai_api_key}
                    onChange={e => setFormData({...formData, ai_api_key: e.target.value})}
-                   style={{ paddingRight: '40px' }}
                  />
                  <button 
                   type="button"

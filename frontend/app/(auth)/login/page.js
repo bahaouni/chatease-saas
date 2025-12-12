@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import React, { useState } from 'react';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
@@ -18,8 +19,9 @@ export default function LoginPage() {
     try {
       const res = await api.post('/auth/login', formData);
       localStorage.setItem('token', res.data.access_token);
+      localStorage.setItem('refreshToken', res.data.refresh_token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      router.push('/dashboard/faq'); // Redirect to FAQ manager directly for MVP
+      router.push('/dashboard/faq'); 
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {
@@ -28,22 +30,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="page-wrapper flex-center">
-      <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '400px' }}>
-        <h1 style={{ fontSize: '2rem', textAlign: 'center' }}>Welcome Back</h1>
-        <p style={{ textAlign: 'center', marginBottom: '2rem' }}>Sign in to continue to ChatEase AI</p>
+    <div className="min-h-screen flex items-center justify-center p-4 pt-24 bg-[var(--bg-primary)]">
+      <div className="glass-panel w-full max-w-md animate-slide-up">
+        <h1 className="text-3xl font-bold text-center mb-2">Welcome Back</h1>
+        <p className="text-center text-[var(--text-secondary)] mb-8">Sign in to continue to ChatEase AI</p>
 
-        {error && <div className="glass" style={{ padding: '10px', color: 'var(--error)', marginBottom: '15px', borderRadius: '8px' }}>{error}</div>}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg mb-6 text-sm text-center">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label className="label">Email Address</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={18} style={{ position: 'absolute', left: '12px', top: '14px', color: 'var(--text-secondary)' }} />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm text-[var(--text-secondary)] mb-2">Email Address</label>
+            <div className="relative">
+              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
               <input
                 type="email"
-                className="input-field"
-                style={{ paddingLeft: '40px' }}
+                className="w-full bg-background/50 border border-input rounded-lg py-3 pl-10 pr-4 text-foreground focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition-all placeholder:text-muted-foreground"
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -52,14 +57,13 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div style={{ marginBottom: '2rem' }}>
-            <label className="label">Password</label>
-            <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: '12px', top: '14px', color: 'var(--text-secondary)' }} />
+          <div>
+            <label className="block text-sm text-[var(--text-secondary)] mb-2">Password</label>
+            <div className="relative">
+              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
               <input
                 type="password"
-                className="input-field"
-                style={{ paddingLeft: '40px' }}
+                className="w-full bg-background/50 border border-input rounded-lg py-3 pl-10 pr-4 text-foreground focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition-all placeholder:text-muted-foreground"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -68,13 +72,14 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'} <ArrowRight size={18} style={{ marginLeft: '8px' }} />
+          <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'} 
+            {!loading && <ArrowRight size={18} className="ml-2" />}
           </button>
         </form>
 
-        <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
-          Don't have an account? <Link href="/signup" style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>Sign up</Link>
+        <p className="mt-6 text-center text-sm text-[var(--text-secondary)]">
+          Don't have an account? <Link href="/signup" className="text-[var(--accent-primary)] hover:underline">Sign up</Link>
         </p>
       </div>
     </div>

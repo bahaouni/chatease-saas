@@ -3,10 +3,15 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { MessageSquare, Settings, CreditCard, LogOut, PlayCircle, FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import ThemeToggle from '../components/ThemeToggle';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import i18n from '@/lib/i18n';
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -15,15 +20,17 @@ export default function DashboardLayout({ children }) {
   };
 
   const navItems = [
-    { name: 'FAQ Manager', href: '/dashboard/faq', icon: MessageSquare },
+    { name: t('dashboard') || 'Dashboard', href: '/dashboard/faq', icon: MessageSquare }, // Using generic dashboard/FAQ generic
     { name: 'Simulator', href: '/dashboard/simulator', icon: PlayCircle },
     { name: 'Chat Logs', href: '/dashboard/logs', icon: FileText },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+    { name: t('settings'), href: '/dashboard/settings', icon: Settings },
     { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   ];
 
+  const isRTL = i18n.dir() === 'rtl';
+
   return (
-    <div className="flex" style={{ display: 'flex', minHeight: '100vh' }}>
+    <div className="flex" style={{ display: 'flex', minHeight: '100vh', direction: isRTL ? 'rtl' : 'ltr' }}>
       {/* Sidebar */}
       <aside className="glass" style={{ 
         width: '260px', 
@@ -33,18 +40,20 @@ export default function DashboardLayout({ children }) {
         position: 'fixed',
         height: '100vh',
         zIndex: 10,
-        borderRight: '1px solid var(--glass-border)',
+        [isRTL ? 'left' : 'right']: 'auto',
+        [isRTL ? 'right' : 'left']: 0,
+        [isRTL ? 'borderLeft' : 'borderRight']: '1px solid var(--glass-border)',
+        [isRTL ? 'borderRight' : 'borderLeft']: 'none',
         borderTop: 'none',
         borderBottom: 'none',
-        borderLeft: 'none',
         borderRadius: 0
       }}>
-        <div style={{ marginBottom: '40px', paddingLeft: '12px' }}>
+        <div style={{ marginBottom: '40px', paddingLeft: isRTL ? 0 : '12px', paddingRight: isRTL ? '12px' : 0 }}>
           <h2 style={{ fontSize: '1.5rem', margin: 0 }}>ChatEase<span style={{ color: 'var(--accent-primary)' }}>.AI</span></h2>
         </div>
 
         <nav style={{ flex: 1 }}>
-          <ul style={{ listStyle: 'none' }}>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href);
               return (
@@ -55,13 +64,13 @@ export default function DashboardLayout({ children }) {
                       alignItems: 'center',
                       padding: '12px 16px',
                       borderRadius: '12px',
-                      color: isActive ? 'white' : 'var(--text-secondary)',
-                      background: isActive ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
-                      border: isActive ? '1px solid rgba(99, 102, 241, 0.2)' : '1px solid transparent',
+                      color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      background: isActive ? 'var(--accent-glow)' : 'transparent',
+                      border: isActive ? '1px solid var(--accent-primary)' : '1px solid transparent',
                       transition: 'all 0.2s',
                       cursor: 'pointer'
                     }}>
-                      <item.icon size={20} style={{ marginRight: '12px', color: isActive ? 'var(--accent-primary)' : 'inherit' }} />
+                      <item.icon size={20} style={{ marginLeft: isRTL ? '12px' : 0, marginRight: isRTL ? 0 : '12px', color: isActive ? 'var(--accent-primary)' : 'inherit' }} />
                       <span style={{ fontWeight: isActive ? 600 : 400 }}>{item.name}</span>
                     </div>
                   </Link>
@@ -83,7 +92,7 @@ export default function DashboardLayout({ children }) {
                 U
               </div>
               <div style={{ overflow: 'hidden' }}>
-                <p style={{ margin: 0, fontWeight: 600, fontSize: '0.9rem', color: 'white' }}>My Account</p>
+                <p style={{ margin: 0, fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>My Account</p>
                 <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Pro Member</p>
               </div>
            </div>
@@ -98,15 +107,31 @@ export default function DashboardLayout({ children }) {
              border: '1px solid rgba(239, 68, 68, 0.2)',
              fontSize: '0.9rem'
            }}>
-             <LogOut size={16} style={{ marginRight: '8px' }} />
-             Sign Out
+             <LogOut size={16} style={{ marginLeft: isRTL ? '8px' : 0, marginRight: isRTL ? 0 : '8px' }} />
+             {t('logout') || 'Sign Out'}
            </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main style={{ flex: 1, padding: '40px', marginLeft: '260px' }}>
-        {children}
+      <main style={{ flex: 1, marginLeft: isRTL ? 0 : '260px', marginRight: isRTL ? '260px' : 0, transition: 'margin 0.3s ease' }}>
+        <header style={{
+          padding: '20px 40px',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          gap: '16px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 5,
+          backdropFilter: 'blur(8px)'
+        }}>
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </header>
+        <div style={{ padding: '0 40px 40px 40px' }}>
+          {children}
+        </div>
       </main>
     </div>
   );

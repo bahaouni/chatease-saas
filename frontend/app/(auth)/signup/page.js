@@ -1,9 +1,10 @@
-"use client";
+'use client';
+
 import React, { useState } from 'react';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, Mail, ArrowRight, User } from 'lucide-react';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -26,22 +27,25 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="page-wrapper flex-center">
-      <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '400px' }}>
-        <h1 style={{ fontSize: '2rem', textAlign: 'center' }}>Get Started</h1>
-        <p style={{ textAlign: 'center', marginBottom: '2rem' }}>Create your account to automate replies</p>
+    <div className="min-h-screen flex items-center justify-center p-4 pt-24 bg-[var(--bg-primary)]">
+      <div className="glass-panel w-full max-w-md animate-slide-up">
+        <h1 className="text-3xl font-bold text-center mb-2">Get Started</h1>
+        <p className="text-center text-[var(--text-secondary)] mb-8">Create your account to automate replies</p>
 
-        {error && <div className="glass" style={{ padding: '10px', color: 'var(--error)', marginBottom: '15px', borderRadius: '8px' }}>{error}</div>}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg mb-6 text-sm text-center">
+            {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem' }}>
-            <label className="label">Email Address</label>
-            <div style={{ position: 'relative' }}>
-              <Mail size={18} style={{ position: 'absolute', left: '12px', top: '14px', color: 'var(--text-secondary)' }} />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm text-[var(--text-secondary)] mb-2">Email Address</label>
+            <div className="relative">
+              <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
               <input
                 type="email"
-                className="input-field"
-                style={{ paddingLeft: '40px' }}
+                className="w-full bg-background/50 border border-input rounded-lg py-3 pl-10 pr-4 text-foreground focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition-all placeholder:text-muted-foreground"
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -50,14 +54,13 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <div style={{ marginBottom: '2rem' }}>
-            <label className="label">Password</label>
-            <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: '12px', top: '14px', color: 'var(--text-secondary)' }} />
+          <div>
+            <label className="block text-sm text-[var(--text-secondary)] mb-2">Password</label>
+            <div className="relative">
+              <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
               <input
                 type="password"
-                className="input-field"
-                style={{ paddingLeft: '40px' }}
+                className="w-full bg-background/50 border border-input rounded-lg py-3 pl-10 pr-4 text-foreground focus:border-gold focus:ring-1 focus:ring-gold focus:outline-none transition-all placeholder:text-muted-foreground"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -66,13 +69,14 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={18} style={{ marginLeft: '8px' }} />
+          <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+            {loading ? 'Creating Account...' : 'Create Account'} 
+            {!loading && <ArrowRight size={18} className="ml-2" />}
           </button>
         </form>
 
-        <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
-          Already have an account? <Link href="/login" style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>Sign in</Link>
+        <p className="mt-6 text-center text-sm text-[var(--text-secondary)]">
+          Already have an account? <Link href="/login" className="text-[var(--accent-primary)] hover:underline">Sign in</Link>
         </p>
       </div>
     </div>
