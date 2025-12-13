@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: chatease_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      # Database connection string for the linked 'db' service
+      - DATABASE_URL=postgresql://postgres:securepassword123@db:5432/chatease
+
+      # Production Config (Change these in your .env or Azure App Settings!)
+      - JWT_SECRET_KEY=production_secret_key_change_if_leaked_987654321
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    container_name: chatease_db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=securepassword123
+      - POSTGRES_DB=chatease
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Optional: Expose if you need to connect externally
+
+volumes:
+  postgres_data:
