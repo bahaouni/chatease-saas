@@ -43,9 +43,42 @@ app.register_blueprint(admin_bp)
 from routes.user_feedback_routes import feedback_bp
 app.register_blueprint(feedback_bp)
 
-# Create DB Tables
+from sqlalchemy import text
+
+# Create DB Tables & Run Migrations
 with app.app_context():
     db.create_all()
+    
+    # Auto-Migration for Production
+    try:
+        with db.engine.connect() as conn:
+            # 1. Add User columns
+            columns = [
+                ("bot_enabled", "BOOLEAN DEFAULT TRUE"),
+                ("active_outside_business_hours", "BOOLEAN DEFAULT FALSE"),
+                ("business_start_hour", "INTEGER DEFAULT 9"),
+                ("business_end_hour", "INTEGER DEFAULT 17"),
+                ("bot_language", "VARCHAR(10) DEFAULT 'en'"),
+                ("role", "VARCHAR(20) DEFAULT 'user'")
+            ]
+            for col_name, col_type in columns:
+                try:
+                    conn.execute(text(f"ALTER TABLE \"user\" ADD COLUMN {col_name} {col_type}"))
+                    print(f"Migration: Added {col_name}")
+                except Exception:
+                    pass # Column likely exists
+
+            # 2. Add rating to feedback
+            try:
+                conn.execute(text("ALTER TABLE feedback ADD COLUMN rating INTEGER DEFAULT 0"))
+                print("Migration: Added rating")
+            except Exception:
+                pass
+
+            conn.commit()
+            print("Auto-migration complete.")
+    except Exception as e:
+        print(f"Migration error (harmless if db is new): {e}")
 
 @app.route('/')
 def home():
