@@ -36,6 +36,12 @@ from routes.billing_routes import billing_bp
 app.register_blueprint(billing_bp)
 from routes.stats_routes import stats_bp
 app.register_blueprint(stats_bp)
+from routes.log_routes import log_bp
+app.register_blueprint(log_bp, url_prefix='/api')
+from routes.admin_routes import admin_bp
+app.register_blueprint(admin_bp)
+from routes.user_feedback_routes import feedback_bp
+app.register_blueprint(feedback_bp)
 
 # Create DB Tables
 with app.app_context():

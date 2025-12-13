@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageSquare, Settings, CreditCard, LogOut, PlayCircle, FileText } from 'lucide-react';
+import { MessageSquare, Settings, CreditCard, LogOut, PlayCircle, FileText, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ThemeToggle from '../components/ThemeToggle';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -21,7 +21,8 @@ export default function DashboardLayout({ children }) {
   };
 
   const navItems = [
-    { name: t('dashboard') || 'Dashboard', href: '/dashboard/faq', icon: MessageSquare }, // Using generic dashboard/FAQ generic
+    { name: 'Overview', href: '/dashboard', icon: Home },
+    { name: 'FAQ', href: '/dashboard/faq', icon: MessageSquare },
     { name: 'Simulator', href: '/dashboard/simulator', icon: PlayCircle },
     { name: 'Chat Logs', href: '/dashboard/logs', icon: FileText },
     { name: t('settings'), href: '/dashboard/settings', icon: Settings },
@@ -51,13 +52,15 @@ export default function DashboardLayout({ children }) {
         borderRadius: 0
       }}>
         <div style={{ marginBottom: '40px', paddingLeft: isRTL ? 0 : '12px', paddingRight: isRTL ? '12px' : 0 }}>
-          <h2 style={{ fontSize: '1.5rem', margin: 0 }}>ChatEase<span style={{ color: 'var(--accent-primary)' }}>.AI</span></h2>
+          <Link href="/dashboard" style={{ textDecoration: 'none', cursor: 'pointer' }}>
+            <h2 style={{ fontSize: '1.5rem', margin: 0 }}>ChatEase<span style={{ color: 'var(--accent-primary)' }}>.AI</span></h2>
+          </Link>
         </div>
 
         <nav style={{ flex: 1 }}>
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {navItems.map((item) => {
-              const isActive = pathname.startsWith(item.href);
+              const isActive = item.href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(item.href);
               return (
                 <li key={item.href} style={{ marginBottom: '8px' }}>
                   <Link href={item.href} style={{ textDecoration: 'none' }}>

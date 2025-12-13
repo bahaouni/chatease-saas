@@ -80,8 +80,67 @@ def webhook_handler():
                 return jsonify({"status": "processed"}), 200
             
             if user and user.is_active:
+                # --- COMMAND DETECTION START ---
+                lower_text = text_body.lower()
+                command_detected = None
+                if 'order' in lower_text:
+                    command_detected = 'order'
+                elif 'book' in lower_text:
+                    command_detected = 'book'
+                elif 'price' in lower_text:
+                    command_detected = 'price'
+                
+                if command_detected:
+                    print(f"Command Detected: {command_detected}")
+                    from models import CommandLog
+                    cmd_log = CommandLog(
+                        user_id=user.id,
+                        customer_number=sender_phone,
+                        command_type=command_detected,
+                        message_content=text_body
+                    )
+                    db.session.add(cmd_log)
+                    db.session.commit()
+                # --- COMMAND DETECTION END ---
+
+                # --- BOT CONTROL START ---
+                # 1. Master Toggle
+                if hasattr(user, 'bot_enabled') and not user.bot_enabled:
+                     print(f"Bot User {user.id} is disabled. Skipping reply.")
+                     return jsonify({"status": "ignored_bot_off"}), 200
+
+                # 2. Business Hours
+                if hasattr(user, 'active_outside_business_hours') and user.active_outside_business_hours:
+                    from datetime import datetime
+                    import pytz
+                    
+                    # Assume UTC for now or fixed offset if simple. User request didn't specify timezone, defaulting to User's likely timezone or UTC.
+                    # For MVP, using UTC or Server Time. Ideally User has a timezone field.
+                    current_hour = datetime.utcnow().hour
+                    
+                    # Logic: If active_outside_business_hours is TRUE, we reply ONLY when OUTSIDE the range.
+                    # Inside range [start, end) = Silent
+                    # Outside range = Active
+                    
+                    start = user.business_start_hour if user.business_start_hour is not None else 9
+                    end = user.business_end_hour if user.business_end_hour is not None else 17
+                    
+                    is_business_hours = False
+                    if start < end:
+                         is_business_hours = start <= current_hour < end
+                    else: # Crosses midnight e.g. 22 to 06
+                         is_business_hours = current_hour >= start or current_hour < end
+                    
+                    if is_business_hours:
+                        print(f"Inside Business Hours ({current_hour} in [{start}, {end})). Bot Silent.")
+                        return jsonify({"status": "ignored_business_hours"}), 200
+
+                # --- BOT CONTROL END ---
+
                 # Generate Reply
-                reply_text = generate_ai_reply(user.id, text_body, user)
+                # Pass language pref
+                lang = user.bot_language if hasattr(user, 'bot_language') and user.bot_language else 'en'
+                reply_text = generate_ai_reply(user.id, text_body, user, language=lang)
                 
                 # Send Reply to WhatsApp
                 # If we have a connection object, use its token. If not, legacy user key.

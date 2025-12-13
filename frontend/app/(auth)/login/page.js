@@ -21,7 +21,12 @@ export default function LoginPage() {
       localStorage.setItem('token', res.data.access_token);
       localStorage.setItem('refreshToken', res.data.refresh_token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      router.push('/dashboard/faq'); 
+      
+      if (res.data.role === 'admin') {
+          router.push('/admin/dashboard');
+      } else {
+          router.push('/dashboard'); 
+      } 
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {

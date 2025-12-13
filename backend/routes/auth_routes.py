@@ -43,7 +43,8 @@ def login():
         "message": "Login successful",
         "access_token": access_token,
         "refresh_token": refresh_token,
-        "user": user.to_dict()
+        "user": user.to_dict(),
+        "role": user.role
     }), 200
 
 @auth_bp.route('/auth/refresh', methods=['POST'])
@@ -69,7 +70,13 @@ def get_profile():
         "whatsapp_api_key": decrypt_value(user.whatsapp_api_key),
         "ai_api_key": decrypt_value(user.ai_api_key),
         "ai_provider": user.ai_provider or 'openai',
-        "system_prompt": user.system_prompt or ""
+        "system_prompt": user.system_prompt or "",
+        # Bot Controls
+        "bot_enabled": user.bot_enabled,
+        "active_outside_business_hours": user.active_outside_business_hours,
+        "business_start_hour": user.business_start_hour,
+        "business_end_hour": user.business_end_hour,
+        "bot_language": user.bot_language
     }), 200
 
 @auth_bp.route('/auth/profile', methods=['PUT'])
@@ -95,6 +102,18 @@ def update_profile():
         user.ai_provider = data['ai_provider']
     if 'system_prompt' in data:
         user.system_prompt = data['system_prompt']
+
+    # Bot Controls
+    if 'bot_enabled' in data:
+        user.bot_enabled = data['bot_enabled']
+    if 'active_outside_business_hours' in data:
+        user.active_outside_business_hours = data['active_outside_business_hours']
+    if 'business_start_hour' in data:
+        user.business_start_hour = int(data['business_start_hour'])
+    if 'business_end_hour' in data:
+        user.business_end_hour = int(data['business_end_hour'])
+    if 'bot_language' in data:
+        user.bot_language = data['bot_language']
         
     db.session.commit()
     return jsonify({"message": "Profile updated successfully"}), 200

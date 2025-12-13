@@ -3,19 +3,34 @@
 import React, { useState } from 'react';
 import { Star, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 export default function FeedbackPage() {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [feedback, setFeedback] = useState('');
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate submission
-    setTimeout(() => {
+    setLoading(true);
+    const toastId = toast.loading('Sending feedback...');
+    
+    try {
+      await api.post('/api/feedback', {
+        rating,
+        message: feedback
+      });
+      toast.success('Feedback sent!', { id: toastId });
       setSubmitted(true);
-    }, 1000);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to send feedback', { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -34,7 +49,7 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto animate-fade-in">
       <h1 className="text-3xl font-bold mb-2">We Value Your Feedback</h1>
       <p className="text-muted-foreground mb-8">Tell us about your experience and how we can improve.</p>
 
@@ -48,15 +63,15 @@ export default function FeedbackPage() {
                 <button
                   key={star}
                   type="button"
-                  className="transition-colors"
+                  className="transition-colors focus:outline-none"
                   onMouseEnter={() => setHoveredRating(star)}
                   onMouseLeave={() => setHoveredRating(0)}
                   onClick={() => setRating(star)}
                 >
                   <Star
-                    className={`w-10 h-10 ${
+                    className={`w-10 h-10 transition-all duration-200 ${
                       star <= (hoveredRating || rating)
-                        ? 'fill-gold text-gold'
+                        ? 'fill-[var(--accent-primary)] text-[var(--accent-primary)] scale-110'
                         : 'text-muted-foreground'
                     }`}
                   />
@@ -72,15 +87,15 @@ export default function FeedbackPage() {
             </label>
             <textarea
               id="feedback"
-              className="input-field min-h-[150px] resize-none"
+              className="input-premium min-h-[150px] resize-none"
               placeholder="What do you like? What could be better?"
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
             />
           </div>
 
-          <Button type="submit" disabled={rating === 0} className="w-full btn-primary">
-            Submit Feedback
+          <Button type="submit" disabled={rating === 0 || loading} className="w-full btn-primary">
+            {loading ? 'Sending...' : 'Submit Feedback'}
           </Button>
         </form>
       </div>

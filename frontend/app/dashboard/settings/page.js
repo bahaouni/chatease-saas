@@ -5,13 +5,21 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import ConnectWhatsApp from './ConnectWhatsApp';
 import { Save, Lock, Smartphone, Key, Cpu, Eye, EyeOff } from 'lucide-react';
 
+import toast from 'react-hot-toast';
+import PremiumToggle from '@/app/components/PremiumToggle';
+
 function SettingsContent() {
   const [formData, setFormData] = useState({
     ai_api_key: '',
     ai_provider: 'openai',
     system_prompt: '',
     whatsapp_phone_id: '',
-    whatsapp_api_key: ''
+    whatsapp_api_key: '',
+    bot_enabled: true,
+    active_outside_business_hours: false,
+    business_start_hour: 9,
+    business_end_hour: 17,
+    bot_language: 'en'
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -32,15 +40,16 @@ function SettingsContent() {
 
   const handleOAuthCode = async (code) => {
     setLoading(true);
+    const toastId = toast.loading('Connecting WhatsApp...');
     try {
       await api.post('/auth/whatsapp/connect', { code });
-      alert('WhatsApp connected successfully!');
+      toast.success('WhatsApp connected successfully!', { id: toastId });
       // Remove code from URL
       router.replace('/dashboard/settings');
       fetchProfile(); // Refresh profile/status
     } catch (err) {
       console.error(err);
-      alert('Failed to connect WhatsApp: ' + (err.response?.data?.error || err.message));
+      toast.error('Failed to connect: ' + (err.response?.data?.error || err.message), { id: toastId });
       router.replace('/dashboard/settings');
     } finally {
       setLoading(false);
@@ -55,10 +64,16 @@ function SettingsContent() {
         ai_provider: res.data.ai_provider || 'openai',
         system_prompt: res.data.system_prompt || '',
         whatsapp_phone_id: res.data.whatsapp_phone_id || '',
-        whatsapp_api_key: res.data.whatsapp_api_key || ''
+        whatsapp_api_key: res.data.whatsapp_api_key || '',
+        bot_enabled: res.data.bot_enabled !== undefined ? res.data.bot_enabled : true,
+        active_outside_business_hours: res.data.active_outside_business_hours || false,
+        business_start_hour: res.data.business_start_hour || 9,
+        business_end_hour: res.data.business_end_hour || 17,
+        bot_language: res.data.bot_language || 'en'
       });
     } catch (err) {
       console.error(err);
+      toast.error('Failed to load profile');
     } finally {
       setLoading(false);
     }
@@ -67,11 +82,12 @@ function SettingsContent() {
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
+    const toastId = toast.loading('Saving settings...');
     try {
       await api.put('/auth/profile', formData);
-      alert('Settings saved successfully!');
+      toast.success('Settings saved successfully!', { id: toastId });
     } catch (err) {
-      alert('Failed to save settings');
+      toast.error('Failed to save settings', { id: toastId });
     } finally {
       setSaving(false);
     }
@@ -92,7 +108,77 @@ function SettingsContent() {
       <div className="glass-panel" style={{ maxWidth: '600px' }}>
         <form onSubmit={handleSave}>
           
-          {/* AI Configuration Section */}
+          {/* Bot Control Section */}
+           <div style={{ marginBottom: '32px' }}>
+             <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+               <Smartphone size={20} style={{ marginRight: '10px', color: 'var(--accent-primary)' }} /> Bot Control
+             </h3>
+
+             {/* Master Toggle */}
+             <div className="mb-4">
+               <PremiumToggle
+                  label="Enable Bot"
+                  description="Turn the automated assistant on or off globally."
+                  checked={formData.bot_enabled}
+                  onChange={(val) => setFormData({...formData, bot_enabled: val})}
+               />
+             </div>
+
+             {/* Language */}
+             <div style={{ marginBottom: '16px' }}>
+               <label className="label">Bot Language</label>
+               <select 
+                 className="input-premium" 
+                 value={formData.bot_language}
+                 onChange={e => setFormData({...formData, bot_language: e.target.value})}
+               >
+                 <option value="en">English (Default)</option>
+                 <option value="ar">Arabic (العربية)</option>
+               </select>
+               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                 The AI will be instructed to reply in this language.
+               </p>
+             </div>
+
+             {/* Business Hours */}
+             <div style={{ marginBottom: '16px', background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
+                <div style={{ marginBottom: '16px' }}>
+                   <PremiumToggle
+                      label="Auto-Reply Outside Business Hours"
+                      description="If enabled, the bot will ONLY reply when you are closed."
+                      checked={formData.active_outside_business_hours}
+                      onChange={(val) => setFormData({...formData, active_outside_business_hours: val})}
+                   />
+                </div>
+
+                {formData.active_outside_business_hours && (
+                   <div style={{ display: 'flex', gap: '16px', animation: 'fadeIn 0.3s ease' }}>
+                     <div style={{ flex: 1 }}>
+                       <label className="label">Start Hour (0-23)</label>
+                       <input 
+                         type="number" min="0" max="23"
+                         className="input-premium" 
+                         value={formData.business_start_hour}
+                         onChange={e => setFormData({...formData, business_start_hour: e.target.value})}
+                       />
+                     </div>
+                     <div style={{ flex: 1 }}>
+                       <label className="label">End Hour (0-23)</label>
+                       <input 
+                         type="number" min="0" max="23"
+                         className="input-premium" 
+                         value={formData.business_end_hour}
+                         onChange={e => setFormData({...formData, business_end_hour: e.target.value})}
+                       />
+                     </div>
+                   </div>
+                )}
+             </div>
+           </div>
+           
+           <hr style={{ borderColor: 'var(--glass-border)', margin: '24px 0', opacity: 0.5 }} />
+
+           {/* AI Configuration Section */}
           <div style={{ marginBottom: '32px' }}>
              <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
                <Cpu size={20} style={{ marginRight: '10px', color: 'var(--accent-primary)' }} /> AI Intelligence
@@ -101,7 +187,7 @@ function SettingsContent() {
              <div style={{ marginBottom: '16px' }}>
                <label className="label">AI Provider</label>
                <select 
-                 className="input-field" 
+                 className="input-premium" 
                  value={formData.ai_provider}
                  onChange={e => setFormData({...formData, ai_provider: e.target.value})}
                >
@@ -117,7 +203,7 @@ function SettingsContent() {
                <div style={{ position: 'relative' }}>
                    <input 
                    type={showAiKey ? "text" : "password"}
-                   className="input-field pr-10" 
+                   className="input-premium pr-10" 
                    placeholder={`Enter your ${getProviderName(formData.ai_provider)} Key...`}
                    value={formData.ai_api_key}
                    onChange={e => setFormData({...formData, ai_api_key: e.target.value})}
@@ -138,7 +224,7 @@ function SettingsContent() {
                    {showAiKey ? <EyeOff size={18} /> : <Eye size={18} />}
                  </button>
                </div>
-               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
                  Required for generating smart replies when no FAQ matches.
                </p>
              </div>
@@ -146,13 +232,13 @@ function SettingsContent() {
              <div style={{ marginBottom: '16px' }}>
                <label className="label">System Instructions (Persona)</label>
                <textarea 
-                 className="input-field" 
+                 className="input-premium" 
                  placeholder="e.g. You are a helpful assistant for a Pizza Shop. Be funny and use emojis."
                  value={formData.system_prompt}
                  onChange={e => setFormData({...formData, system_prompt: e.target.value})}
                  style={{ minHeight: '100px', resize: 'vertical' }}
                />
-               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
                  Tell the AI who it is and how it should behave.
                </p>
              </div>

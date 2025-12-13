@@ -14,7 +14,19 @@ class User(db.Model):
     system_prompt = db.Column(db.Text, nullable=True) # Custom instructions
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Bot Controls
+    bot_enabled = db.Column(db.Boolean, default=True)
+    active_outside_business_hours = db.Column(db.Boolean, default=False)
+    business_start_hour = db.Column(db.Integer, default=9) # 9 AM
+    business_end_hour = db.Column(db.Integer, default=17) # 5 PM
+    business_end_hour = db.Column(db.Integer, default=17) # 5 PM
+    bot_language = db.Column(db.String(10), default='en') # en, ar
     
+    # RBAC
+    # RBAC
+    role = db.Column(db.String(20), default='user') # user, admin
+
     # Relationships
     faqs = db.relationship('FAQ', backref='owner', lazy=True)
     logs = db.relationship('MessageLog', backref='owner', lazy=True)
@@ -25,7 +37,28 @@ class User(db.Model):
             'email': self.email,
             'whatsapp_phone_id': self.whatsapp_phone_id,
             'is_active': self.is_active,
+            'role': self.role,
             'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+class Feedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Optional, can be anon
+    message = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(20), default='general') # bug, feature, complaint, general
+    rating = db.Column(db.Integer, default=0) # 0-5 stars
+    status = db.Column(db.String(20), default='new') # new, resolved
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'message': self.message,
+            'type': self.type,
+            'rating': self.rating,
+            'status': self.status,
+            'created_at': self.created_at.isoformat()
         }
 
 class FAQ(db.Model):
@@ -78,4 +111,21 @@ class WhatsAppConnection(db.Model):
             'display_phone_number': self.display_phone_number,
             'business_id': self.business_id,
             'created_at': self.created_at.isoformat()
+        }
+
+class CommandLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    customer_number = db.Column(db.String(50), nullable=False)
+    command_type = db.Column(db.String(20), nullable=False) # order, book, price
+    message_content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'customer_number': self.customer_number,
+            'command_type': self.command_type,
+            'message_content': self.message_content,
+            'timestamp': self.timestamp.isoformat()
         }

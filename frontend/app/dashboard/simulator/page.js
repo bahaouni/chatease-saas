@@ -114,11 +114,10 @@ export default function SimulatorPage() {
         <div style={{ padding: '20px', borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)' }}>
           <form onSubmit={handleSend} style={{ display: 'flex', gap: '10px' }}>
             <input
-              className="input-field"
+              className="input-premium"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type a test message..."
-              style={{ marginBottom: 0 }}
             />
             <button 
               type="submit" 

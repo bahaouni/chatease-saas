@@ -63,7 +63,7 @@ def find_best_faq_match(user_id, user_message):
         return best_match.answer
     return None
 
-def generate_ai_reply(user_id, user_message, user_model):
+def generate_ai_reply(user_id, user_message, user_model, language='en'):
     # 1. Check FAQ first
     faq_answer = find_best_faq_match(user_id, user_message)
     if faq_answer:
@@ -85,8 +85,18 @@ def generate_ai_reply(user_id, user_message, user_model):
         
         custom_instructions = user_model.system_prompt if user_model.system_prompt else default_instructions
 
+        
+        # Language Instruction
+        lang_instruction = ""
+        if language == 'ar':
+            lang_instruction = "IMPORTANT: You MUST reply in Arabic language."
+        elif language == 'en':
+             lang_instruction = "Reply in English."
+        
         system_prompt = f"""
 {custom_instructions}
+
+{lang_instruction}
 
 FAQ Knowledge Base:
 {faq_context}
