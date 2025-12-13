@@ -29,5 +29,23 @@ services:
     ports:
       - "5432:5432" # Optional: Expose if you need to connect externally
 
+  caddy:
+    image: caddy:2-alpine
+    container_name: chatease_caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:

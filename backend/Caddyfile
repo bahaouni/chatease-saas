@@ -1,0 +1,7 @@
+{
+    # Global options
+}
+
+{$DOMAIN_NAME} {
+    reverse_proxy backend:5000
+}
