@@ -27,7 +27,7 @@ export function Navbar() {
             <div className="w-9 h-9 rounded-lg bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-colors">
               <MessageCircle className="w-5 h-5 text-gold" />
             </div>
-            <span className="text-lg font-bold text-foreground">ChatEase<span className="text-gold">.AI</span></span>
+            <span className="text-lg font-bold text-foreground">ChatEase<span className="text-gold">.online</span></span>
           </Link>
 
           {/* Desktop Links */}

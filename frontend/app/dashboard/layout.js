@@ -54,7 +54,7 @@ export default function DashboardLayout({ children }) {
       }}>
         <div style={{ marginBottom: '40px', paddingLeft: isRTL ? 0 : '12px', paddingRight: isRTL ? '12px' : 0 }}>
           <Link href="/dashboard" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-            <h2 style={{ fontSize: '1.5rem', margin: 0 }}>ChatEase<span style={{ color: 'var(--accent-primary)' }}>.AI</span></h2>
+            <h2 style={{ fontSize: '1.5rem', margin: 0 }}>ChatEase<span style={{ color: 'var(--accent-primary)' }}>.online</span></h2>
           </Link>
         </div>
 
