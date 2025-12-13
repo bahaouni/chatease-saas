@@ -248,13 +248,25 @@ function SettingsContent() {
 
            {/* WhatsApp Configuration Section */}
            <div style={{ marginBottom: '32px' }}>
+              <h3 style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+                <MessageSquare size={20} style={{ marginRight: '10px', color: 'var(--success)' }} /> WhatsApp Connection
+              </h3>
               <ConnectWhatsApp />
               
-              <div style={{ marginTop: '24px', opacity: 0.6, pointerEvents: 'none' }}>
-                  <p style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>
-                      Manual configuration is deprecated. Please use the OAuth connection above.
+               <div style={{ marginTop: '24px', padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+                  <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', color: 'var(--text-secondary)' }}>Alternative: Manual Connection</h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                      If you have your own WABA ID and Token, you can connect manually without the Meta login flow.
                   </p>
-              </div>
+                  <button 
+                      type="button" // Prevent form submit
+                      onClick={() => router.push('/dashboard/settings/manual')}
+                      className="btn"
+                      style={{ fontSize: '0.8rem', padding: '6px 12px', background: 'transparent', border: '1px solid var(--glass-border)' }}
+                  >
+                      enter credentials manually
+                  </button>
+               </div>
            </div>
 
           <button type="submit" className="btn btn-primary" disabled={saving}>
