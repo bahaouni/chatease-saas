@@ -30,14 +30,23 @@ api.interceptors.response.use(
     // If 401 (Unauthorized) or 422 (Unprocessable/Invalid Token Signature)
     if (error.response && (error.response.status === 401 || error.response.status === 422) && !originalRequest._retry) {
       // If it's a 422, it's likely a bad signature (secret changed), so just logout immediately
+      // BUT only if not already on login page to avoid loops
       if (error.response.status === 422) {
-         if (typeof window !== 'undefined') {
+         const msg = error.response.data?.msg || "";
+         const isTokenError = msg.includes("Signature") || msg.includes("token") || msg.includes("Invalid") || msg.includes("expired");
+         
+         if (isTokenError && typeof window !== 'undefined' && window.location.pathname !== '/login') {
+            console.warn("Invalid Token (422), logging out:", msg);
             localStorage.removeItem('token');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('user');
             window.location.href = '/login';
+            return Promise.reject(error);
          }
-         return Promise.reject(error);
+         // If 422 but not a token error (e.g. validation), just reject (don't logout)
+         if (!isTokenError) {
+             return Promise.reject(error);
+         }
       }
 
       originalRequest._retry = true;
