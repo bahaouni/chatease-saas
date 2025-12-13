@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageSquare, Settings, CreditCard, LogOut, PlayCircle, FileText, Home } from 'lucide-react';
+import { MessageSquare, Settings, CreditCard, LogOut, PlayCircle, FileText, Home, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ThemeToggle from '../components/ThemeToggle';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -22,6 +22,7 @@ export default function DashboardLayout({ children }) {
 
   const navItems = [
     { name: 'Overview', href: '/dashboard', icon: Home },
+    { name: 'Guide', href: '/dashboard/guide', icon: BookOpen },
     { name: 'FAQ', href: '/dashboard/faq', icon: MessageSquare },
     { name: 'Simulator', href: '/dashboard/simulator', icon: PlayCircle },
     { name: 'Chat Logs', href: '/dashboard/logs', icon: FileText },
