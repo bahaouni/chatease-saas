@@ -42,6 +42,8 @@ from routes.admin_routes import admin_bp
 app.register_blueprint(admin_bp)
 from routes.user_feedback_routes import feedback_bp
 app.register_blueprint(feedback_bp)
+from routes.simulator_routes import simulator_bp
+app.register_blueprint(simulator_bp)
 
 from sqlalchemy import text
 
