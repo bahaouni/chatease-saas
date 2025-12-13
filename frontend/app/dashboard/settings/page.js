@@ -3,7 +3,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import api from '@/lib/api';
 import { useSearchParams, useRouter } from 'next/navigation';
 import ConnectWhatsApp from './ConnectWhatsApp';
-import { Save, Lock, Smartphone, Key, Cpu, Eye, EyeOff } from 'lucide-react';
+import { Save, Lock, Smartphone, Key, Cpu, Eye, EyeOff, MessageSquare } from 'lucide-react';
 
 import toast from 'react-hot-toast';
 import PremiumToggle from '@/app/components/PremiumToggle';
