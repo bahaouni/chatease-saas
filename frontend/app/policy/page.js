@@ -42,14 +42,14 @@ export default function PrivacyPolicy() {
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-4 text-white">5. Data Removal</h2>
         <p className="mb-4">
-          You have the right to request deletion of your data. You can disconnect your WhatsApp account at any time from the dashboard, which stops our access. To request full account deletion, please contact us at support@chatease.ai.
+          You have the right to request deletion of your data. You can disconnect your WhatsApp account at any time from the dashboard, which stops our access. To request full account deletion, please contact us at support@chatease.online.
         </p>
       </section>
 
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-4 text-white">6. Contact Us</h2>
         <p className="mb-4">
-          If you have any questions about this Privacy Policy, please contact us at support@chatease.ai.
+          If you have any questions about this Privacy Policy, please contact us at support@chatease.online.
         </p>
       </section>
     </div>

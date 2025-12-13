@@ -124,63 +124,168 @@ from services.whatsapp_service import WhatsAppService
 from models import WhatsAppConnection
 from datetime import datetime, timedelta
 
-@auth_bp.route('/auth/whatsapp/url', methods=['GET'])
+# ============ EMBEDDED SIGNUP ENDPOINTS ============
+
+@auth_bp.route('/auth/whatsapp/embedded/register', methods=['POST'])
 @jwt_required()
-def get_whatsapp_auth_url():
-    """Returns the Meta OAuth URL for the user to connect WhatsApp."""
-    app_id = os.getenv("FB_APP_ID")
-    redirect_uri = os.getenv("REDIRECT_URI")
-    scope = "whatsapp_business_management,whatsapp_business_messaging,business_management"
-    state = "some_random_secure_string" # In prod, use a real CSRF token linked to session
+def embedded_register_phone():
+    """
+    Step 1: Register a phone number for WhatsApp Business.
+    This creates a WABA and registers the phone number.
+    """
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
-    if not app_id or not redirect_uri:
-        return jsonify({"error": "Server misconfiguration: Missing FB_APP_ID or REDIRECT_URI"}), 500
+    data = request.get_json()
+    phone_number = data.get('phone_number')  # E.164 format: +1234567890
+    display_name = data.get('display_name', 'My Business')
+    
+    if not phone_number:
+        return jsonify({"error": "Phone number is required"}), 400
+    
+    # Validate E.164 format
+    if not phone_number.startswith('+'):
+        return jsonify({"error": "Phone number must be in E.164 format (e.g., +1234567890)"}), 400
 
-    auth_url = (
-        f"https://www.facebook.com/v24.0/dialog/oauth?"
-        f"client_id={app_id}&redirect_uri={redirect_uri}&scope={scope}&state={state}"
-    )
-    return jsonify({"url": auth_url}), 200
+    system_token = os.getenv("META_SYSTEM_USER_TOKEN")
+    if not system_token:
+        return jsonify({"error": "Server misconfiguration: META_SYSTEM_USER_TOKEN not set"}), 500
 
-@auth_bp.route('/auth/callback', methods=['GET'])
-def auth_callback():
-    """Handles the redirect from Meta after user authorizes."""
-    code = request.args.get('code')
-    error = request.args.get('error')
+    try:
+        # Register phone number and create WABA
+        result = WhatsAppService.register_phone_number(
+            phone_number=phone_number,
+            display_name=display_name,
+            system_user_token=system_token
+        )
+        
+        # Store temporary data in session or database
+        # For now, we'll return it to frontend and expect it back in verify step
+        return jsonify({
+            "message": "Phone number registered. Verification code will be sent.",
+            "waba_id": result['waba_id'],
+            "phone_number_id": result['phone_number_id'],
+            "display_name": result['display_name'],
+            "next_step": "request_code"
+        }), 200
+
+    except Exception as e:
+        print(f"Embedded Signup Error: {e}")
+        return jsonify({"error": f"Registration failed: {str(e)}"}), 500
+
+@auth_bp.route('/auth/whatsapp/embedded/request-code', methods=['POST'])
+@jwt_required()
+def embedded_request_code():
+    """
+    Step 2: Request verification code via SMS or VOICE.
+    """
+    data = request.get_json()
+    phone_number_id = data.get('phone_number_id')
+    method = data.get('method', 'SMS')  # SMS or VOICE
     
-    # We need to know WHICH user this is.
-    # Since this is a redirect, we can't easily pass the JWT header.
-    # Options:
-    # 1. User state param to pass user_id (if signed, secure).
-    # 2. Redirect to frontend with code, then frontend calls backend with code + JWT. 
-    #    (The plan said "Flask callback exchanges code", implying backend handles the redirect directly.)
-    # 3. If redirect_uri points to frontend, frontend gets code, then calls backend.
+    if not phone_number_id:
+        return jsonify({"error": "phone_number_id is required"}), 400
     
-    # Let's assume the user meant: Frontend -> Meta -> Backend Check?
-    # Actually, the user's prompt says: "redirect_uri=https://yourapp.com/auth/callback" and "Flask: OAuth callback".
-    # This implies the backend handles it. But backend needs to know the user.
-    # Usually in this flow, we store a session cookie or a temporary state mapping to user_id.
+    if method not in ['SMS', 'VOICE']:
+        return jsonify({"error": "method must be SMS or VOICE"}), 400
+
+    system_token = os.getenv("META_SYSTEM_USER_TOKEN")
+    if not system_token:
+        return jsonify({"error": "Server misconfiguration"}), 500
+
+    try:
+        result = WhatsAppService.request_verification_code(
+            phone_number_id=phone_number_id,
+            method=method,
+            system_user_token=system_token
+        )
+        
+        return jsonify({
+            "message": f"Verification code sent via {method}",
+            "success": result.get('success', True)
+        }), 200
+
+    except Exception as e:
+        print(f"Request Code Error: {e}")
+        return jsonify({"error": f"Failed to send code: {str(e)}"}), 500
+
+@auth_bp.route('/auth/whatsapp/embedded/verify', methods=['POST'])
+@jwt_required()
+def embedded_verify_code():
+    """
+    Step 3: Verify the code received via SMS/Voice.
+    """
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json()
+    phone_number_id = data.get('phone_number_id')
+    waba_id = data.get('waba_id')
+    code = data.get('code')
     
-    # FOR THIS IMPLEMENTATION (SaaS style usually redirects to frontend first):
-    # If the user is navigating the browser, the browser has cookies. 
-    # But we are using JWT in headers usually.
-    
-    # BETTER APPROACH FOR SPA:
-    # Redirect URI should be the FRONTEND URL (e.g. localhost:3000/dashboard/settings).
-    # Frontend grabs ?code=..., then sends POST /auth/whatsapp/connect { code: ... } with JWT.
-    
-    # However, if we MUST follow the "Flask callback" server-side instruction strictly:
-    # We would need a cookie session.
-    
-    # Let's stick to the "Frontend handles redirect" mostly because it's cleaner for JWT auth apps.
-    # Wait, the prompt said: "Users click 'Connect WhatsApp' ... send them to Meta OAuth ... redirect_uri=.../auth/callback".
-    # And then "Flask: OAuth callback ... exchange code".
-    
-    # If I implement `/auth/callback` as a GET here, it won't have the User's JWT unless it's in a cookie.
-    
-    # Alternative: The `state` parameter can contain the user_id (signed or encrypted).
-    # For MVP, let's put `user_id` in `state`.
-    pass
+    if not phone_number_id or not code or not waba_id:
+        return jsonify({"error": "phone_number_id, waba_id, and code are required"}), 400
+
+    system_token = os.getenv("META_SYSTEM_USER_TOKEN")
+    if not system_token:
+        return jsonify({"error": "Server misconfiguration"}), 500
+
+    try:
+        # Verify the code
+        verify_result = WhatsAppService.verify_phone_code(
+            phone_number_id=phone_number_id,
+            code=code,
+            system_user_token=system_token
+        )
+        
+        if not verify_result.get('success', False):
+            return jsonify({"error": "Invalid verification code"}), 400
+        
+        # Get phone number info
+        phone_info = WhatsAppService.get_phone_number_info(
+            phone_number_id=phone_number_id,
+            system_user_token=system_token
+        )
+        
+        # Setup webhook subscription
+        WhatsAppService.setup_webhook_subscription(
+            waba_id=waba_id,
+            system_user_token=system_token
+        )
+        
+        # Save to database
+        conn = WhatsAppConnection.query.filter_by(user_id=user.id).first()
+        if not conn:
+            conn = WhatsAppConnection(user_id=user.id)
+            db.session.add(conn)
+            
+        conn.waba_id = waba_id
+        conn.phone_number_id = phone_number_id
+        conn.display_phone_number = phone_info.get('display_phone_number', 'Unknown')
+        conn.access_token = system_token  # Using system token for now
+        conn.token_expires_at = None  # System tokens don't expire
+        conn.signup_method = 'embedded'
+        
+        db.session.commit()
+        
+        return jsonify({
+            "message": "WhatsApp connected successfully!",
+            "waba_id": waba_id,
+            "phone_number": phone_info.get('display_phone_number'),
+            "verified_name": phone_info.get('verified_name')
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Verification Error: {e}")
+        return jsonify({"error": f"Verification failed: {str(e)}"}), 500
+
+# ============ LEGACY OAUTH ENDPOINTS (DEPRECATED) ============
+# Keeping for reference, but these are no longer used
 
 @auth_bp.route('/auth/whatsapp/connect', methods=['POST'])
 @jwt_required()
@@ -258,6 +363,53 @@ def connect_whatsapp_account():
     except Exception as e:
         print(f"WhatsApp Connect Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+@auth_bp.route('/auth/whatsapp/manual', methods=['POST'])
+@jwt_required()
+def manual_connect_whatsapp():
+    """
+    Allows user to manually paste their Phone ID, WABA ID, and Permanent Token.
+    Bypasses the "Tech Provider" verification requirement.
+    """
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json()
+    phone_id = data.get('phone_id')
+    waba_id = data.get('waba_id')
+    access_token = data.get('access_token')
+    
+    if not phone_id or not waba_id or not access_token:
+        return jsonify({"error": "Missing required fields (Phone ID, WABA ID, Access Token)"}), 400
+
+    try:
+        # Check if already connected
+        conn = WhatsAppConnection.query.filter_by(user_id=user.id).first()
+        if not conn:
+            conn = WhatsAppConnection(user_id=user.id)
+            db.session.add(conn)
+            
+        conn.waba_id = waba_id
+        conn.phone_number_id = phone_id
+        # In a real app, verify these IDs by calling Meta Graph API manually here?
+        # For now, trust the user input.
+        conn.display_phone_number = "Manual Config" # We could fetch this from Meta if we wanted
+        conn.access_token = access_token
+        conn.token_expires_at = None # Assume permanent token
+        conn.signup_method = 'manual'  # Mark as manual connection
+        
+        db.session.commit()
+        
+        return jsonify({
+            "message": "WhatsApp connected manually",
+            "connected": True
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Database Error: {str(e)}"}), 500
 
 @auth_bp.route('/auth/whatsapp/status', methods=['GET'])
 @jwt_required()

@@ -99,6 +99,7 @@ class WhatsAppConnection(db.Model):
     access_token = db.Column(db.Text, nullable=False) # Should be encrypted in prod
     token_expires_at = db.Column(db.DateTime, nullable=True) # Long-lived token expiry
     business_id = db.Column(db.String(50), nullable=True)
+    signup_method = db.Column(db.String(20), default='embedded') # embedded, manual, oauth_legacy
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref=db.backref('whatsapp_connection', uselist=False))
