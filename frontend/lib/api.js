@@ -27,8 +27,19 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If 401 and not already retrying
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    // If 401 (Unauthorized) or 422 (Unprocessable/Invalid Token Signature)
+    if (error.response && (error.response.status === 401 || error.response.status === 422) && !originalRequest._retry) {
+      // If it's a 422, it's likely a bad signature (secret changed), so just logout immediately
+      if (error.response.status === 422) {
+         if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+         }
+         return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
 
       try {
